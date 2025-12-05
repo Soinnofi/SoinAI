@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoinAI - Самообучающийся ИИ с API</title>
+    <title>SoinAI - Реальный API Генератор</title>
     <style>
         * {
             margin: 0;
@@ -67,7 +67,7 @@
         
         /* Чат */
         .chat-messages {
-            height: 400px;
+            height: 300px;
             overflow-y: auto;
             padding: 15px;
             background: rgba(0, 0, 0, 0.2);
@@ -111,12 +111,8 @@
             min-height: 60px;
         }
         
-        textarea:focus {
-            outline: 2px solid #4cc9f0;
-        }
-        
         button {
-            padding: 15px 25px;
+            padding: 12px 20px;
             border: none;
             border-radius: 10px;
             background: #4cc9f0;
@@ -131,19 +127,33 @@
         }
         
         /* API Код */
+        .api-container {
+            position: relative;
+        }
+        
         .api-code {
             background: #1e1e1e;
             border-radius: 10px;
             padding: 20px;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 12px;
             overflow-x: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
             color: #4cc9f0;
             border: 1px solid rgba(76, 201, 240, 0.3);
-            height: 400px;
+            height: 300px;
             overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            background: rgba(76, 201, 240, 0.2);
+            border: 1px solid #4cc9f0;
         }
         
         .controls {
@@ -154,9 +164,10 @@
         }
         
         .control-btn {
-            padding: 10px 15px;
+            padding: 8px 15px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
         }
         
         .stats {
@@ -189,324 +200,404 @@
             padding: 15px 25px;
             border-radius: 10px;
             animation: slideIn 0.3s;
+            z-index: 1000;
         }
         
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        
+        .test-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        .test-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .test-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(76, 201, 240, 0.1);
+            border-radius: 5px;
+            border-left: 3px solid #4cc9f0;
+        }
+        
+        .real-api-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(76, 201, 240, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(76, 201, 240, 0.2);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🤖 SoinAI v2.0 <span style="font-size: 1rem; background: #7209b7; padding: 3px 10px; border-radius: 10px;">работает на GitHub Pages</span></h1>
-            <p>Самообучающийся ИИ с API для Chatbox - 1 файл, 0 ошибок, 100% бесплатно</p>
+            <h1>🤖 SoinAI - Реальный API Генератор</h1>
+            <p>Создает рабочий API код на основе ваших диалогов</p>
         </header>
         
         <div class="main">
             <!-- Левая часть - Чат -->
             <div class="panel">
-                <h2>💬 Чат с SoinAI</h2>
+                <h2>💬 Обучайте SoinAI</h2>
                 
                 <div class="stats">
                     <div class="stat-item">
-                        <span>Слов в словаре:</span>
-                        <span class="stat-value" id="wordCount">0</span>
+                        <span>Слов:</span>
+                        <span class="stat-value" id="wordCount">6</span>
                     </div>
                     <div class="stat-item">
                         <span>Диалогов:</span>
                         <span class="stat-value" id="dialogCount">0</span>
                     </div>
                     <div class="stat-item">
-                        <span>Ответов:</span>
-                        <span class="stat-value" id="responseCount">0</span>
+                        <span>Выучено:</span>
+                        <span class="stat-value" id="learnedCount">0</span>
                     </div>
                 </div>
                 
                 <div class="chat-messages" id="chatMessages">
-                    <!-- Сообщения будут здесь -->
+                    <div class="message ai-message">👋 Привет! Я SoinAI. Обучите меня - я создам API на основе наших диалогов!</div>
                 </div>
                 
                 <div class="input-area">
                     <textarea 
                         id="userInput" 
-                        placeholder="Напишите сообщение... (Enter для отправки)"
+                        placeholder="Напишите сообщение..."
                         rows="2"
                     ></textarea>
-                    <button onclick="sendMessage()">Отправить</button>
+                    <button onclick="sendMessage()">➤</button>
                 </div>
                 
                 <div class="controls">
-                    <button class="control-btn" onclick="quickMessage('Привет!')">👋 Привет</button>
-                    <button class="control-btn" onclick="quickMessage('Как дела?')">😊 Как дела?</button>
-                    <button class="control-btn" onclick="quickMessage('Что ты умеешь?')">🤔 Что умеешь?</button>
-                    <button class="control-btn" onclick="clearChat()">🗑️ Очистить</button>
-                    <button class="control-btn" onclick="exportData()">💾 Экспорт</button>
-                    <button class="control-btn" onclick="importData()">📤 Импорт</button>
-                    <button class="control-btn" onclick="resetAI()">🔄 Сброс</button>
+                    <button class="control-btn" onclick="quickMessage('Привет!')">Привет</button>
+                    <button class="control-btn" onclick="quickMessage('Как дела?')">Как дела?</button>
+                    <button class="control-btn" onclick="quickMessage('Что ты умеешь?')">Что умеешь?</button>
+                    <button class="control-btn" onclick="clearChat()">Очистить</button>
+                    <button class="control-btn" onclick="resetAI()">Сброс</button>
                 </div>
             </div>
             
-            <!-- Правая часть - API -->
+            <!-- Правая часть - API Генератор -->
             <div class="panel">
-                <h2>🔌 API Код для Chatbox</h2>
-                <div class="api-code" id="apiCode">
-// SoinAI API будет сгенерирован после обучения
-// Начните общаться с ИИ слева!
+                <h2>🔧 Генератор API</h2>
+                
+                <div class="api-container">
+                    <div class="api-code" id="apiCode">
+// Нажмите "Сгенерировать API" после обучения
+                    </div>
+                    <button class="copy-btn" onclick="copyAPICode()">📋 Копировать</button>
                 </div>
                 
-                <div class="controls" style="margin-top: 15px;">
-                    <button onclick="generateAPICode()">🔧 Сгенерировать API</button>
-                    <button onclick="copyAPICode()">📋 Копировать API</button>
-                    <button onclick="testAPI()">🧪 Тест API</button>
+                <div class="controls">
+                    <button onclick="generateRealAPICode()">🔄 Сгенерировать API</button>
+                    <button onclick="downloadAPIFile()">💾 Скачать .js файл</button>
+                    <button onclick="testGeneratedAPI()">🧪 Тест API</button>
                 </div>
                 
-                <h2 style="margin-top: 30px;">📚 Как использовать API</h2>
-                <p style="margin-bottom: 15px;">Просто скопируйте код выше и вставьте в ваш проект:</p>
+                <div class="test-area">
+                    <h3>Тестирование API:</h3>
+                    <div class="test-input">
+                        <input type="text" id="apiTestInput" placeholder="Введите текст для теста..." value="Привет!">
+                        <button onclick="runAPITest()">Тест</button>
+                    </div>
+                    <div class="test-result" id="apiTestResult">
+                        Результат теста появится здесь
+                    </div>
+                </div>
                 
-                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
-                    <code style="color: #4cc9f0;">
-// Простейшее использование:<br>
-SoinAI.chat("Привет!").then(response => {<br>
-&nbsp;&nbsp;console.log(response);<br>
-});
-                    </code>
+                <div class="real-api-section">
+                    <h3>📦 Как использовать сгенерированный API:</h3>
+                    <p>1. Скопируйте код выше</p>
+                    <p>2. Создайте файл <code>soinai-api.js</code> в вашем проекте</p>
+                    <p>3. Подключите в HTML: <code>&lt;script src="soinai-api.js"&gt;&lt;/script&gt;</code></p>
+                    <p>4. Используйте: <code>SoinAI.chat("Привет!")</code></p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ==================== SOINAI КЛАСС ====================
-        class SoinAI {
-            constructor() {
-                console.log('🚀 SoinAI v2.0 инициализирован');
-                this.model = this.loadModel();
-                this.updateStats();
-                this.showWelcome();
-                this.setupEventListeners();
-                this.generateAPICode();
+        // ==================== РЕАЛЬНЫЙ SOINAI ====================
+        
+        // Модель ИИ
+        let soinAIModel = {
+            dictionary: {
+                'привет': ['Привет! Как дела?', 'Здравствуйте!', 'Добрый день!'],
+                'как дела': ['Отлично! А у вас?', 'Хорошо, спасибо!', 'Прекрасно!'],
+                'что ты': ['Я SoinAI - ИИ который учится!', 'Я ваш цифровой помощник'],
+                'помощь': ['Чем могу помочь?', 'Задайте ваш вопрос!'],
+                'спасибо': ['Пожалуйста!', 'Всегда рад помочь!'],
+                'пока': ['До свидания!', 'Удачи!', 'Пока!']
+            },
+            patterns: {},
+            stats: {
+                dialogs: 0,
+                learned: 0,
+                words: 6,
+                lastUpdate: new Date().toISOString()
+            },
+            history: []
+        };
+        
+        // Загрузка из localStorage
+        function loadModel() {
+            try {
+                const saved = localStorage.getItem('soinai_real_model');
+                if (saved) {
+                    soinAIModel = JSON.parse(saved);
+                    updateStats();
+                }
+            } catch (e) {
+                console.log('Используется начальная модель');
+            }
+        }
+        
+        // Сохранение
+        function saveModel() {
+            try {
+                localStorage.setItem('soinai_real_model', JSON.stringify(soinAIModel));
+            } catch (e) {}
+        }
+        
+        // Поиск ответа
+        function getResponse(input) {
+            const cleanInput = input.toLowerCase().trim();
+            
+            // Поиск в словаре
+            for (const [word, responses] of Object.entries(soinAIModel.dictionary)) {
+                if (cleanInput.includes(word)) {
+                    return responses[Math.floor(Math.random() * responses.length)];
+                }
             }
             
-            loadModel() {
-                try {
-                    const saved = localStorage.getItem('soinai_model');
-                    if (saved) {
-                        return JSON.parse(saved);
-                    }
-                } catch (e) {}
+            // Поиск по словам
+            const words = cleanInput.split(' ');
+            for (const word of words) {
+                if (word.length > 3 && soinAIModel.dictionary[word]) {
+                    return soinAIModel.dictionary[word][Math.floor(Math.random() * soinAIModel.dictionary[word].length)];
+                }
+            }
+            
+            // Общий ответ
+            const general = [
+                'Интересно! Расскажите больше.',
+                'Понятно. Что вы думаете об этом?',
+                'Хороший вопрос! Давайте обсудим.',
+                'Я еще учусь, но стараюсь помочь!',
+                'Можете рассказать подробнее?'
+            ];
+            
+            return general[Math.floor(Math.random() * general.length)];
+        }
+        
+        // Обучение
+        function learn(input, response) {
+            const words = input.toLowerCase()
+                .replace(/[^\w\sа-я]/gi, ' ')
+                .split(' ')
+                .filter(word => word.length > 2);
+            
+            if (words.length === 0) return;
+            
+            const mainWord = words[0];
+            
+            if (!soinAIModel.dictionary[mainWord]) {
+                soinAIModel.dictionary[mainWord] = [];
+            }
+            
+            if (!soinAIModel.dictionary[mainWord].includes(response)) {
+                soinAIModel.dictionary[mainWord].push(response);
+                soinAIModel.stats.learned++;
+                soinAIModel.stats.words = Object.keys(soinAIModel.dictionary).length;
+                soinAIModel.stats.lastUpdate = new Date().toISOString();
                 
-                // Начальная модель
-                return {
+                showNotification(`✅ Выучено слово: "${mainWord}"`);
+            }
+            
+            // Добавляем в историю
+            soinAIModel.history.push({
+                input: input,
+                response: response,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Ограничиваем историю
+            if (soinAIModel.history.length > 50) {
+                soinAIModel.history.shift();
+            }
+            
+            saveModel();
+            updateStats();
+        }
+        
+        // ==================== ИНТЕРФЕЙС ====================
+        
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            input.value = '';
+            
+            // Сообщение пользователя
+            addMessage(message, true);
+            
+            // Ответ ИИ
+            setTimeout(() => {
+                const response = getResponse(message);
+                addMessage(response, false);
+                
+                // Обучаемся
+                learn(message, response);
+                
+                // Обновляем статистику
+                soinAIModel.stats.dialogs++;
+                updateStats();
+                
+                // Автоматически генерируем API после каждого диалога
+                generateRealAPICode();
+            }, 500);
+        }
+        
+        function addMessage(text, isUser) {
+            const chat = document.getElementById('chatMessages');
+            const message = document.createElement('div');
+            message.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            message.textContent = text;
+            chat.appendChild(message);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        
+        function quickMessage(msg) {
+            document.getElementById('userInput').value = msg;
+            sendMessage();
+        }
+        
+        function clearChat() {
+            document.getElementById('chatMessages').innerHTML = 
+                '<div class="message ai-message">👋 Чат очищен. Продолжайте обучение!</div>';
+        }
+        
+        function resetAI() {
+            if (confirm('Сбросить все обучение?')) {
+                soinAIModel = {
                     dictionary: {
                         'привет': ['Привет! Как дела?', 'Здравствуйте!', 'Добрый день!'],
                         'как дела': ['Отлично! А у вас?', 'Хорошо, спасибо!', 'Прекрасно!'],
-                        'что ты': ['Я SoinAI - самообучающийся ИИ!', 'Я ваш цифровой помощник'],
+                        'что ты': ['Я SoinAI - ИИ который учится!', 'Я ваш цифровой помощник'],
                         'помощь': ['Чем могу помочь?', 'Задайте ваш вопрос!'],
                         'спасибо': ['Пожалуйста!', 'Всегда рад помочь!'],
                         'пока': ['До свидания!', 'Удачи!', 'Пока!']
                     },
+                    patterns: {},
                     stats: {
                         dialogs: 0,
                         learned: 0,
-                        words: 0
-                    }
+                        words: 6,
+                        lastUpdate: new Date().toISOString()
+                    },
+                    history: []
                 };
-            }
-            
-            saveModel() {
-                try {
-                    localStorage.setItem('soinai_model', JSON.stringify(this.model));
-                } catch (e) {}
-            }
-            
-            getResponse(input) {
-                const cleanInput = input.toLowerCase().trim();
                 
-                // Ищем точное совпадение
-                for (const [word, responses] of Object.entries(this.model.dictionary)) {
-                    if (cleanInput.includes(word)) {
-                        return responses[Math.floor(Math.random() * responses.length)];
-                    }
-                }
-                
-                // Ищем по словам
-                const words = cleanInput.split(' ');
-                for (const word of words) {
-                    if (word.length > 3 && this.model.dictionary[word]) {
-                        const responses = this.model.dictionary[word];
-                        return responses[Math.floor(Math.random() * responses.length)];
-                    }
-                }
-                
-                // Общий ответ
-                const general = [
-                    'Интересно! Расскажите больше.',
-                    'Понятно. Что вы думаете об этом?',
-                    'Хороший вопрос! Давайте обсудим.',
-                    'Я еще учусь, но стараюсь помочь!',
-                    'Можете рассказать подробнее?'
-                ];
-                
-                return general[Math.floor(Math.random() * general.length)];
-            }
-            
-            learn(input, response) {
-                const words = input.toLowerCase()
-                    .replace(/[^\w\sа-я]/gi, ' ')
-                    .split(' ')
-                    .filter(word => word.length > 2);
-                
-                if (words.length === 0) return;
-                
-                const mainWord = words[0];
-                
-                if (!this.model.dictionary[mainWord]) {
-                    this.model.dictionary[mainWord] = [];
-                }
-                
-                if (!this.model.dictionary[mainWord].includes(response)) {
-                    this.model.dictionary[mainWord].push(response);
-                    this.model.stats.learned++;
-                    this.model.stats.words = Object.keys(this.model.dictionary).length;
-                    
-                    this.showNotification(`✅ Выучено новое слово: "${mainWord}"`);
-                }
-            }
-            
-            // ==================== ИНТЕРФЕЙС ====================
-            
-            setupEventListeners() {
-                // Enter для отправки
-                document.getElementById('userInput').addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        this.sendMessage();
-                    }
-                });
-            }
-            
-            sendMessage() {
-                const input = document.getElementById('userInput');
-                const message = input.value.trim();
-                
-                if (!message) return;
-                
-                input.value = '';
-                
-                // Сообщение пользователя
-                this.addMessage(message, true);
-                
-                // Ответ ИИ
-                setTimeout(() => {
-                    const response = this.getResponse(message);
-                    this.addMessage(response, false);
-                    
-                    // Обучаемся
-                    this.learn(message, response);
-                    
-                    // Обновляем статистику
-                    this.model.stats.dialogs++;
-                    this.updateStats();
-                    this.saveModel();
-                    this.generateAPICode();
-                }, 500);
-            }
-            
-            addMessage(text, isUser) {
-                const chat = document.getElementById('chatMessages');
-                const message = document.createElement('div');
-                message.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
-                message.textContent = text;
-                chat.appendChild(message);
-                chat.scrollTop = chat.scrollHeight;
-            }
-            
-            showWelcome() {
-                const messages = [
-                    "🤖 Здравствуйте! Я SoinAI v2.0",
-                    "🧠 Я самообучающийся ИИ",
-                    "💾 Все данные хранятся в вашем браузере",
-                    "🔧 Я генерирую API код для ваших проектов",
-                    "🚀 Начните общение - я буду учиться!"
-                ];
-                
-                const chat = document.getElementById('chatMessages');
-                if (chat.children.length === 0) {
-                    messages.forEach((msg, i) => {
-                        setTimeout(() => {
-                            this.addMessage(msg, false);
-                        }, i * 700);
-                    });
-                }
-            }
-            
-            updateStats() {
-                document.getElementById('wordCount').textContent = 
-                    this.model.stats.words || Object.keys(this.model.dictionary).length;
-                document.getElementById('dialogCount').textContent = this.model.stats.dialogs;
-                document.getElementById('responseCount').textContent = this.model.stats.learned;
-            }
-            
-            showNotification(message) {
-                const notification = document.createElement('div');
-                notification.className = 'notification';
-                notification.textContent = message;
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.remove();
-                }, 3000);
-            }
-            
-            // ==================== API ГЕНЕРАТОР ====================
-            
-            generateAPICode() {
-                const wordsCount = Object.keys(this.model.dictionary).length;
-                const dialogsCount = this.model.stats.dialogs;
-                const learnedCount = this.model.stats.learned;
-                
-                const apiCode = `// ================================================
-// SoinAI v2.0 API - Самообучающийся ИИ
-// Сгенерировано: ${new Date().toISOString()}
-// Слов в словаре: ${wordsCount}
-// Диалогов: ${dialogsCount}
-// Выучено ответов: ${learnedCount}
-// ================================================
-
-class SoinAI {
-    constructor() {
-        this.model = ${JSON.stringify(this.model, null, 4)};
-        this.version = '2.0.0';
-    }
-    
-    // Поиск ответа в словаре
-    findResponse(input) {
-        const cleanInput = input.toLowerCase().trim();
-        
-        // 1. Точное совпадение
-        for (const [word, responses] of Object.entries(this.model.dictionary)) {
-            if (cleanInput.includes(word)) {
-                return responses[Math.floor(Math.random() * responses.length)];
+                localStorage.removeItem('soinai_real_model');
+                clearChat();
+                updateStats();
+                generateRealAPICode();
+                showNotification('🔄 SoinAI сброшен!');
             }
         }
         
-        // 2. Поиск по ключевым словам
-        const words = cleanInput.split(' ');
+        function updateStats() {
+            document.getElementById('wordCount').textContent = soinAIModel.stats.words;
+            document.getElementById('dialogCount').textContent = soinAIModel.stats.dialogs;
+            document.getElementById('learnedCount').textContent = soinAIModel.stats.learned;
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // ==================== РЕАЛЬНЫЙ API ГЕНЕРАТОР ====================
+        
+        function generateRealAPICode() {
+            const words = Object.keys(soinAIModel.dictionary);
+            const responses = Object.values(soinAIModel.dictionary).flat().length;
+            
+            const apiCode = `// ====================================================
+// SoinAI API v2.0 - Генерация: ${new Date().toLocaleString()}
+// Слов в словаре: ${words.length}
+// Ответов: ${responses}
+// Диалогов: ${soinAIModel.stats.dialogs}
+// ====================================================
+
+// Основной класс SoinAI
+class SoinAI {
+    constructor() {
+        this.model = ${JSON.stringify(soinAIModel.dictionary, null, 2)};
+        this.version = "2.0.0";
+        this.lastUpdate = "${soinAIModel.stats.lastUpdate}";
+    }
+    
+    // Метод для поиска ответа
+    findResponse(input) {
+        if (!input || typeof input !== 'string') {
+            return "Пожалуйста, введите текст";
+        }
+        
+        const cleanInput = input.toLowerCase().trim();
+        
+        // 1. Проверка точных совпадений
+        for (const [word, responses] of Object.entries(this.model)) {
+            if (cleanInput.includes(word)) {
+                const randomIndex = Math.floor(Math.random() * responses.length);
+                return responses[randomIndex];
+            }
+        }
+        
+        // 2. Проверка по отдельным словам
+        const words = cleanInput.split(' ').filter(w => w.length > 2);
         for (const word of words) {
-            if (word.length > 2 && this.model.dictionary[word]) {
-                return this.model.dictionary[word][Math.floor(Math.random() * this.model.dictionary[word].length)];
+            if (this.model[word]) {
+                const responses = this.model[word];
+                return responses[Math.floor(Math.random() * responses.length)];
             }
         }
         
         // 3. Общие ответы
         const generalResponses = [
-            'Интересно! Расскажите подробнее.',
-            'Понятно. Что вы думаете об этом?',
-            'Хороший вопрос! Давайте обсудим.',
-            'Я еще учусь, но стараюсь помочь!',
-            'Можете рассказать больше?'
+            "Интересно! Расскажите подробнее.",
+            "Понятно. Что вы думаете об этом?",
+            "Хороший вопрос! Давайте обсудим.",
+            "Я еще учусь, но стараюсь помочь!",
+            "Можете рассказать больше?",
+            "Это любопытно! А что еще?"
         ];
         
         return generalResponses[Math.floor(Math.random() * generalResponses.length)];
@@ -515,96 +606,148 @@ class SoinAI {
     // Основной метод для чата
     async chat(message) {
         try {
+            if (!message || message.trim() === '') {
+                return {
+                    success: false,
+                    error: "Пустое сообщение",
+                    message: "Пожалуйста, напишите что-нибудь"
+                };
+            }
+            
             const response = this.findResponse(message);
             
             return {
                 success: true,
                 message: response,
+                original: message,
                 timestamp: new Date().toISOString(),
-                model: 'SoinAI v2.0',
                 version: this.version
             };
         } catch (error) {
             return {
                 success: false,
-                message: 'Произошла ошибка',
                 error: error.message,
+                message: "Произошла ошибка при обработке",
                 timestamp: new Date().toISOString()
             };
         }
     }
     
-    // Быстрый ответ (без промисов)
+    // Быстрый ответ (синхронный)
     quickChat(message) {
         const response = this.findResponse(message);
         return {
             response: response,
-            time: new Date().toLocaleTimeString()
+            time: new Date().toLocaleTimeString(),
+            success: true
         };
     }
     
-    // Получить информацию о модели
+    // Получение информации о модели
     getInfo() {
         return {
+            name: "SoinAI",
             version: this.version,
-            totalWords: Object.keys(this.model.dictionary).length,
-            totalDialogs: this.model.stats.dialogs,
-            totalLearned: this.model.stats.learned,
-            created: this.model.stats.created || new Date().toISOString()
+            words: Object.keys(this.model).length,
+            responses: Object.values(this.model).reduce((sum, arr) => sum + arr.length, 0),
+            lastUpdate: this.lastUpdate,
+            status: "active"
         };
     }
     
     // Проверка работоспособности
     ping() {
         return {
-            status: 'online',
-            service: 'SoinAI v2.0',
-            timestamp: new Date().toISOString()
+            status: "online",
+            service: "SoinAI API",
+            timestamp: new Date().toISOString(),
+            uptime: "100%"
         };
+    }
+    
+    // Добавление нового ответа (для обучения)
+    learn(input, response) {
+        const words = input.toLowerCase()
+            .replace(/[^\\w\\sа-я]/gi, ' ')
+            .split(' ')
+            .filter(word => word.length > 2);
+        
+        if (words.length === 0) return false;
+        
+        const mainWord = words[0];
+        
+        if (!this.model[mainWord]) {
+            this.model[mainWord] = [];
+        }
+        
+        if (!this.model[mainWord].includes(response)) {
+            this.model[mainWord].push(response);
+            return true;
+        }
+        
+        return false;
     }
 }
 
-// ==================== ЭКСПОРТ ====================
+// ==================== ИНИЦИАЛИЗАЦИЯ И ЭКСПОРТ ====================
 
-// Для Node.js
+// Создаем экземпляр SoinAI
+const soinAIInstance = new SoinAI();
+
+// Экспорт для разных сред
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = SoinAI;
-}
-
-// Для браузера (глобальная переменная)
-if (typeof window !== 'undefined') {
-    window.SoinAI = new SoinAI();
+    // Для Node.js
+    module.exports = soinAIInstance;
+} else if (typeof define === 'function' && define.amd) {
+    // Для AMD
+    define([], () => soinAIInstance);
+} else {
+    // Для браузера (глобальная переменная)
+    window.SoinAI = soinAIInstance;
 }
 
 // ==================== ПРИМЕРЫ ИСПОЛЬЗОВАНИЯ ====================
 
-// Пример 1: Простое использование
-// SoinAI.chat("Привет!").then(response => {
-//     console.log("Ответ:", response.message);
-// });
+/*
 
-// Пример 2: Для чат-бота
-// async function processMessage(userInput) {
-//     const response = await SoinAI.chat(userInput);
-//     return response.message;
-// }
+// Пример 1: Базовое использование
+SoinAI.chat("Привет!").then(response => {
+    console.log("Ответ:", response.message);
+});
 
-// Пример 3: Быстрый ответ
-// const quickResponse = SoinAI.quickChat("Как дела?");
-// console.log(quickResponse.response);
+// Пример 2: Быстрый ответ
+const quickResponse = SoinAI.quickChat("Как дела?");
+console.log(quickResponse.response);
 
-// ==================== ИНТЕГРАЦИЯ С CHATBOX ====================
+// Пример 3: Информация о модели
+console.log(SoinAI.getInfo());
 
-// Для интеграции с Chatbox просто вставьте этот код в ваш проект
-// и используйте SoinAI.chat() или SoinAI.quickChat()`;
+// Пример 4: Для чат-бота
+async function processUserMessage(userInput) {
+    const response = await SoinAI.chat(userInput);
+    if (response.success) {
+        return response.message;
+    } else {
+        return "Извините, произошла ошибка";
+    }
+}
 
-                document.getElementById('apiCode').textContent = apiCode;
-            }
+// Пример 5: Обучение на лету
+SoinAI.learn("новое слово", "новый ответ");
+
+*/`;
             
-            copyAPICode() {
-                const code = document.getElementById('apiCode').textContent;
+            document.getElementById('apiCode').textContent = apiCode;
+            return apiCode;
+        }
+        
+        function copyAPICode() {
+            const code = document.getElementById('apiCode').textContent;
+            
+            // Проверяем, есть ли реальный код
+            if (code.includes('SoinAI API v2.0')) {
                 navigator.clipboard.writeText(code).then(() => {
-                    this.showNotification('✅ API код скопирован в буфер обмена!');
+                    showNotification('✅ API код скопирован в буфер!');
                 }).catch(() => {
                     // Fallback
                     const textarea = document.createElement('textarea');
@@ -613,152 +756,87 @@ if (typeof window !== 'undefined') {
                     textarea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textarea);
-                    this.showNotification('✅ API код скопирован!');
+                    showNotification('✅ API код скопирован!');
                 });
-            }
-            
-            testAPI() {
-                const testInput = 'Привет!';
-                const response = this.getResponse(testInput);
-                alert(`Тест API:\nВопрос: "${testInput}"\nОтвет: "${response}"`);
-            }
-            
-            // ==================== ЭКСПОРТ/ИМПОРТ ====================
-            
-            exportData() {
-                const data = {
-                    model: this.model,
-                    exportDate: new Date().toISOString(),
-                    version: '2.0.0'
-                };
-                
-                const blob = new Blob([JSON.stringify(data, null, 2)], { 
-                    type: 'application/json' 
-                });
-                
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `soinai_backup_${new Date().toISOString().slice(0,10)}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                
-                this.showNotification('✅ Данные экспортированы в JSON файл!');
-            }
-            
-            importData() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                
-                input.onchange = (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        try {
-                            const data = JSON.parse(event.target.result);
-                            
-                            if (data.model && data.model.dictionary) {
-                                this.model = data.model;
-                                this.saveModel();
-                                this.updateStats();
-                                this.generateAPICode();
-                                
-                                // Очищаем чат и показываем приветствие
-                                document.getElementById('chatMessages').innerHTML = '';
-                                this.showWelcome();
-                                
-                                this.showNotification('✅ Данные успешно импортированы!');
-                            } else {
-                                throw new Error('Некорректный формат файла');
-                            }
-                        } catch (error) {
-                            this.showNotification('❌ Ошибка импорта: неверный формат файла');
-                        }
-                    };
-                    
-                    reader.readAsText(file);
-                };
-                
-                input.click();
-            }
-            
-            resetAI() {
-                if (confirm('Вы уверены? Все обученные данные будут удалены!')) {
-                    localStorage.removeItem('soinai_model');
-                    this.model = this.loadModel();
-                    document.getElementById('chatMessages').innerHTML = '';
-                    this.showWelcome();
-                    this.updateStats();
-                    this.generateAPICode();
-                    this.showNotification('🔄 SoinAI сброшен к начальному состоянию!');
-                }
+            } else {
+                showNotification('⚠️ Сначала сгенерируйте API код!');
             }
         }
         
-        // ==================== ГЛОБАЛЬНЫЕ ФУНКЦИИ ====================
+        function downloadAPIFile() {
+            const apiCode = generateRealAPICode();
+            const blob = new Blob([apiCode], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'soinai-api.js';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('💾 API файл скачан!');
+        }
         
-        let soinAI;
+        function testGeneratedAPI() {
+            // Создаем временный API из сгенерированного кода
+            const apiCode = document.getElementById('apiCode').textContent;
+            
+            if (!apiCode.includes('class SoinAI')) {
+                showNotification('⚠️ Сначала сгенерируйте API код!');
+                return;
+            }
+            
+            try {
+                // Выполняем API код в песочнице
+                const apiFunction = new Function(apiCode + '\nreturn SoinAI;');
+                const SoinAI = apiFunction();
+                
+                // Тестируем
+                const testInput = document.getElementById('apiTestInput').value || 'Привет!';
+                const response = SoinAI.quickChat(testInput);
+                
+                document.getElementById('apiTestResult').innerHTML = 
+                    `<strong>Тест API:</strong><br>
+                     <strong>Ввод:</strong> "${testInput}"<br>
+                     <strong>Ответ:</strong> "${response.response}"<br>
+                     <strong>Статус:</strong> ${response.success ? '✅ Успешно' : '❌ Ошибка'}`;
+                
+            } catch (error) {
+                document.getElementById('apiTestResult').innerHTML = 
+                    `<strong>❌ Ошибка тестирования:</strong><br>${error.message}`;
+            }
+        }
         
-        // Инициализация при загрузке страницы
+        function runAPITest() {
+            testGeneratedAPI();
+        }
+        
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        
+        // При загрузке страницы
         document.addEventListener('DOMContentLoaded', () => {
-            soinAI = new SoinAI();
+            loadModel();
+            
+            // Настройка Enter для отправки
+            document.getElementById('userInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Генерируем начальный API код
+            generateRealAPICode();
         });
         
-        // Глобальные функции для вызова из HTML
-        function sendMessage() {
-            soinAI.sendMessage();
-        }
-        
-        function quickMessage(msg) {
-            document.getElementById('userInput').value = msg;
-            soinAI.sendMessage();
-        }
-        
-        function clearChat() {
-            document.getElementById('chatMessages').innerHTML = '';
-            soinAI.showWelcome();
-        }
-        
-        function exportData() {
-            soinAI.exportData();
-        }
-        
-        function importData() {
-            soinAI.importData();
-        }
-        
-        function resetAI() {
-            soinAI.resetAI();
-        }
-        
-        function generateAPICode() {
-            soinAI.generateAPICode();
-            soinAI.showNotification('🔧 API код обновлен!');
-        }
-        
-        function copyAPICode() {
-            soinAI.copyAPICode();
-        }
-        
-        function testAPI() {
-            soinAI.testAPI();
-        }
-        
-        // Экспортируем для использования в других скриптах
-        window.SoinAI_Global = {
-            sendMessage,
-            quickMessage,
-            clearChat,
-            exportData,
-            importData,
-            resetAI,
-            generateAPICode,
-            copyAPICode,
-            testAPI
-        };
+        // Экспортируем функции для глобального использования
+        window.sendMessage = sendMessage;
+        window.quickMessage = quickMessage;
+        window.clearChat = clearChat;
+        window.resetAI = resetAI;
+        window.generateRealAPICode = generateRealAPICode;
+        window.copyAPICode = copyAPICode;
+        window.downloadAPIFile = downloadAPIFile;
+        window.testGeneratedAPI = testGeneratedAPI;
+        window.runAPITest = runAPITest;
     </script>
 </body>
 </html>
