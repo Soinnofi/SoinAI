@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoinAI v2 - Самообучающийся ИИ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 20px;
+        }
+        
+        /* Левый сайдбар - Управление */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Центр - Чат */
+        .chat-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Правый сайдбар - Статистика */
+        .stats-sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            color: #4cc9f0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h2 {
+            color: #7209b7;
+            margin: 20px 0 15px;
+            font-size: 1.3rem;
+        }
+        
+        .version {
+            background: #7209b7;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        /* Чат */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            max-height: 500px;
+        }
+        
+        .message {
+            margin: 10px 0;
+            padding: 12px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .user-message {
+            background: linear-gradient(90deg, #4361ee, #3a0ca3);
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message {
+            background: linear-gradient(90deg, #7209b7, #560bad);
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .message-content {
+            line-height: 1.5;
+        }
+        
+        /* Ввод */
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        textarea {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: inherit;
+            font-size: 16px;
+            resize: none;
+            min-height: 60px;
+        }
+        
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        textarea:focus {
+            outline: 2px solid #4cc9f0;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-btn {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            background: rgba(76, 201, 240, 0.2);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        /* Статистика */
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .stat-value {
+            color: #4cc9f0;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Словарь */
+        .dictionary-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 3px solid #7209b7;
+        }
+        
+        .word {
+            color: #4cc9f0;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .responses {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Управление */
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-btn {
+            width: 100%;
+            margin-bottom: 10px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+        }
+        
+        .control-btn.delete {
+            background: linear-gradient(90deg, #f72585, #b5179e);
+        }
+        
+        .control-btn.export {
+            background: linear-gradient(90deg, #2ec4b6, #20a39e);
+        }
+        
+        /* Фильтры */
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .filter-item input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* API */
+        .api-code {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            color: #4cc9f0;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Скроллбар */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4cc9f0;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Левый сайдбар - Управление -->
+        <div class="sidebar">
+            <h1><i class="fas fa-brain"></i> SoinAI <span class="version">v2.0</span></h1>
+            
+            <div class="control-group">
+                <h2><i class="fas fa-cog"></i> Управление</h2>
+                <button class="control-btn" onclick="soinAI.exportData()">
+                    <i class="fas fa-download"></i> Экспорт данных
+                </button>
+                <button class="control-btn" onclick="soinAI.importData()">
+                    <i class="fas fa-upload"></i> Импорт данных
+                </button>
+                <button class="control-btn delete" onclick="soinAI.resetModel()">
+                    <i class="fas fa-trash"></i> Сбросить обучение
+                </button>
+                <button class="control-btn" onclick="soinAI.generateAPICode()">
+                    <i class="fas fa-code"></i> Сгенерировать API
+                </button>
+            </div>
+            
+            <div class="control-group">
+                <h2><i class="fas fa-filter"></i> Фильтры</h2>
+                <label class="filter-item">
+                    <input type="checkbox" id="filterProfanity" checked>
+                    <span>Фильтр мата</span>
+                </label>
+                <label class="filter-item">
+                    <input type="checkbox" id="filterPersonal" checked>
+                    <span>Защита данных</span>
+                </label>
+                <label class="filter-item">
+                    <input type="checkbox" id="enableLearning" checked>
+                    <span>Автообучение</span>
+                </label>
+                <label class="filter-item">
+                    <input type="checkbox" id="saveHistory" checked>
+                    <span>Сохранять историю</span>
+                </label>
+            </div>
+            
+            <div class="control-group">
+                <h2><i class="fas fa-database"></i> Данные</h2>
+                <div class="stat-card">
+                    <div class="stat-row">
+                        <span class="stat-label">Слов в словаре:</span>
+                        <span class="stat-value" id="wordCount">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Выучено ответов:</span>
+                        <span class="stat-value" id="responseCount">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Диалогов:</span>
+                        <span class="stat-value" id="dialogCount">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Центр - Чат -->
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Сообщения будут здесь -->
+            </div>
+            
+            <div class="input-container">
+                <textarea 
+                    id="userInput" 
+                    placeholder="Введите сообщение... (Shift+Enter для новой строки)"
+                    rows="2"
+                ></textarea>
+                <button onclick="soinAI.sendMessage()">
+                    <i class="fas fa-paper-plane"></i> Отправить
+                </button>
+            </div>
+            
+            <div class="quick-buttons">
+                <button class="quick-btn" onclick="soinAI.quickMessage('Привет!')">
+                    Привет
+                </button>
+                <button class="quick-btn" onclick="soinAI.quickMessage('Как дела?')">
+                    Как дела?
+                </button>
+                <button class="quick-btn" onclick="soinAI.quickMessage('Что ты умеешь?')">
+                    Возможности
+                </button>
+                <button class="quick-btn" onclick="soinAI.quickMessage('Расскажи о себе')">
+                    О себе
+                </button>
+                <button class="quick-btn" onclick="soinAI.quickMessage('Помоги мне')">
+                    Помощь
+                </button>
+            </div>
+        </div>
+        
+        <!-- Правый сайдбар - Статистика и словарь -->
+        <div class="stats-sidebar">
+            <h2><i class="fas fa-chart-line"></i> Статистика обучения</h2>
+            <div class="stat-card">
+                <div class="stat-row">
+                    <span class="stat-label">Уровень ИИ:</span>
+                    <span class="stat-value" id="aiLevel">Новичок</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="aiProgress" style="width: 10%"></div>
+                </div>
+                
+                <div class="stat-row">
+                    <span class="stat-label">Активность:</span>
+                    <span class="stat-value" id="activity">Низкая</span>
+                </div>
+                
+                <div class="stat-row">
+                    <span class="stat-label">Последнее обучение:</span>
+                    <span class="stat-value" id="lastLearn">Никогда</span>
+                </div>
+            </div>
+            
+            <h2><i class="fas fa-book"></i> Словарь ИИ</h2>
+            <div id="dictionaryList">
+                <!-- Словарь будет здесь -->
+            </div>
+            
+            <h2><i class="fas fa-plug"></i> API Код</h2>
+            <div class="api-code" id="apiCode">
+                // Нажмите "Сгенерировать API"
+            </div>
+            <button onclick="soinAI.copyAPICode()" style="margin-top: 10px; width: 100%;">
+                <i class="fas fa-copy"></i> Копировать API
+            </button>
+        </div>
+    </div>
+    
+    <script src="soinai-v2.js"></script>
+</body>
+</html>
