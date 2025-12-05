@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoinAI v2 API</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #4cc9f0;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        pre {
+            background: #252526;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #4cc9f0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .copy-btn {
+            background: #4cc9f0;
+            color: #1e1e1e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 0;
+            display: block;
+        }
+        .copy-btn:hover {
+            background: #4361ee;
+        }
+        .back-btn {
+            background: #7209b7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SoinAI v2.0 API</h1>
+        <p>Скопируйте этот код для использования в ваших проектах:</p>
+        
+        <pre id="apiCode">// API код будет загружен динамически</pre>
+        
+        <button class="copy-btn" onclick="copyCode()">Копировать код</button>
+        <a href="index.html" class="back-btn">← Вернуться к SoinAI</a>
+    </div>
+    
+    <script>
+        // Загружаем API код из localStorage
+        function loadAPICode() {
+            try {
+                const model = JSON.parse(localStorage.getItem('soinai_v2_model') || '{}');
+                const filters = JSON.parse(localStorage.getItem('soinai_v2_filters') || '{}');
+                
+                const apiCode = `// SoinAI v2.0 - Автономный ИИ API
+// Создан на основе вашего обучения
+
+const SoinAI_API = {
+    version: '2.0.0',
+    model: ${JSON.stringify(model, null, 2)},
+    
+    process: function(message) {
+        // Ваш код обработки здесь
+        return "Привет! Я SoinAI.";
+    }
+};
+
+// Экспорт
+if (typeof module !== 'undefined') module.exports = SoinAI_API;
+else window.SoinAI = SoinAI_API;`;
+                
+                document.getElementById('apiCode').textContent = apiCode;
+            } catch (e) {
+                document.getElementById('apiCode').textContent = '// Ошибка загрузки данных. Сначала обучите SoinAI.';
+            }
+        }
+        
+        function copyCode() {
+            const code = document.getElementById('apiCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ API код скопирован!');
+            });
+        }
+        
+        // Загружаем код при открытии страницы
+        window.onload = loadAPICode;
+    </script>
+</body>
+</html>
